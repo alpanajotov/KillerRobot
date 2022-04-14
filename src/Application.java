@@ -1,9 +1,12 @@
+import java.util.Random;
 import java.util.Scanner;
 
 public class Application {
 
     public static Scanner scanner = new Scanner(System.in);
+    public static Random randomGenerator = new Random();
     public static boolean isRunning = true;
+    public static int availableHitCount = 4;
 
     public static void processMove() {
         final int OBJECT_WALL   = 1;
@@ -36,9 +39,47 @@ public class Application {
         System.out.println("Робота спря да се движи");
     }
 
-    public static void processFight() {
+    public static boolean isTargetLocked() {
+        // Засичане
+        int randomNumber = randomGenerator.nextInt(5000);
+        return randomNumber % 2 == 0;
+    }
+    public static boolean isBatteryCharged() {
+        // Провекра на батерията
+        return availableHitCount != 0;
+    }
+    public static boolean isHitSafe() {
+        //Проверка за безопасност на батерията
+        int targetChanceId =  randomGenerator.nextInt(10) + 1;
+        return targetChanceId != 5;
+    }
+    public static boolean isBatteryEmpty() {
+        return !isBatteryCharged();
+    }
+    public static boolean isHitProcessable() {
+        boolean isTargetLocked = isTargetLocked();
+        boolean isBatteryCharged = isBatteryCharged();
+        boolean isHitSave = isHitSafe();
+
+        return isBatteryCharged && isTargetLocked && isHitSave;
 
     }
+
+    public static void processFight() {
+        
+        if (isBatteryEmpty()) {
+            processCharge();
+        }
+        if (isHitProcessable()) {
+            System.out.println("Ударът е нанесен успешно");
+            availableHitCount--;
+        }
+    }
+
+    private static void processCharge() {
+        availableHitCount = 4;
+    }
+
     public static void processExit() {
         isRunning = false;
     }
